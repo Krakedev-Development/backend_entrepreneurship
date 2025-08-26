@@ -8,7 +8,7 @@ export class AnalisisIAMapper {
   toDomain(prismaAnalisis: AnalisisIAPrismaModel): AnalisisIA {
     return new AnalisisIA(
       prismaAnalisis.negocio_id,
-      prismaAnalisis.fecha_analisis
+      prismaAnalisis.fecha_analisis === null ? undefined : prismaAnalisis.fecha_analisis
     );
   }
 }

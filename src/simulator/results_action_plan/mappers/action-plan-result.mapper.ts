@@ -7,9 +7,9 @@ export class ActionPlanResultMapper {
   toDomain(prismaEntity: ActionPlanResultPrismaModel): ActionPlanResult {
     return new ActionPlanResult(
       prismaEntity.analisis_id,
-      prismaEntity.titulo,
-      prismaEntity.descripcion,
-      prismaEntity.prioridad,
+      prismaEntity.titulo  || '',
+      prismaEntity.descripcion || '',
+      prismaEntity.prioridad || '',
       prismaEntity.plan_id,
     );
   }

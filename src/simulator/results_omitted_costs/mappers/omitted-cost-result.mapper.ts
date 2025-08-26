@@ -7,8 +7,8 @@ export class OmittedCostResultMapper {
   toDomain(prismaEntity: OmittedCostResultPrismaModel): OmittedCostResult {
     return new OmittedCostResult(
       prismaEntity.analisis_id,
-      prismaEntity.costo_omitido,
-      prismaEntity.importancia,
+      prismaEntity.costo_omitido || '',
+      prismaEntity.importancia || '',
       prismaEntity.costo_omitido_id,
     );
   }

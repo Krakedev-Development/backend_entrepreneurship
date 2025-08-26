@@ -23,7 +23,6 @@ export class AiService {
       return response.text();
     } catch (error) {
       console.error('❌ Error al generar contenido:', error);
-      // NestJS maneja los códigos de estado HTTP a través de excepciones
       throw new InternalServerErrorException('Error interno al generar contenido con Gemini.');
     }
   }

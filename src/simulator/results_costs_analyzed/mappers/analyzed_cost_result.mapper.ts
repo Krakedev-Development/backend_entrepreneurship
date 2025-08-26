@@ -7,11 +7,11 @@ export class AnalyzedCostResultMapper {
   toDomain(prismaEntity: AnalyzedCostResultPrismaModel): ResultadosCostosAnalizados {
     return new ResultadosCostosAnalizados(
       prismaEntity.analisis_id,
-      prismaEntity.nombre_costo,
-      prismaEntity.valor_recibido,
-      prismaEntity.rango_estimado,
-      prismaEntity.evaluacion,
-      prismaEntity.comentario,
+      prismaEntity.nombre_costo || '',
+      prismaEntity.valor_recibido || '',
+      prismaEntity.rango_estimado || '',
+      prismaEntity.evaluacion || '',
+      prismaEntity.comentario || '',
     );
   }
 }
