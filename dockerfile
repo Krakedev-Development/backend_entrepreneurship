@@ -1,35 +1,50 @@
-# --- Etapa 1: Builder ---
-# Usamos una imagen completa de Node.js para instalar dependencias y construir la aplicación.
-FROM node:20-alpine AS builder
-
-# Establecemos el directorio de trabajo dentro del contenedor
-WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-# Instalamos todas las dependencias (incluyendo devDependencies para la compilación)
-RUN npm install
-
-COPY . .
-
-# Generamos el cliente de Prisma (esencial)
-RUN npx prisma generate
-
-RUN npm run build
-
-RUN npm prune --production
-
-# Usamos una imagen ligera de Node.js para la ejecución, resultando en una imagen final pequeña.
+# Usar la imagen oficial de Node.js 20
 FROM node:20-alpine
 
-# Establecemos el directorio de trabajo
-WORKDIR /usr/src/app
-#Copiamos los archivos necesarios
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/package*.json ./
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/prisma ./prisma
-# Exponemos el puerto en el que la aplicación NestJS se ejecuta por defecto
+# Instalar dependencias del sistema necesarias
+RUN apk add --no-cache bash netcat-openbsd
+
+# Establecer el directorio de trabajo
+WORKDIR /app
+
+# Copiar archivos de dependencias primero para aprovechar la caché de Docker
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Instalar todas las dependencias (incluyendo devDependencies para la compilación)
+RUN npm ci --only=production=false
+
+# Generar el cliente de Prisma
+RUN npx prisma generate
+
+# Copiar el código fuente
+COPY . .
+
+# Hacer los scripts ejecutables
+RUN chmod +x scripts/*.sh
+
+# Compilar la aplicación
+RUN npm run build
+
+# Verificar que la compilación fue exitosa
+RUN ls -la dist/
+
+# Crear usuario no-root para seguridad
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001
+
+# Cambiar propiedad de los archivos al usuario no-root
+RUN chown -R nestjs:nodejs /app
+
+# Exponer el puerto
 EXPOSE 3000
 
-CMD ["node", "dist/main"]
+# Variables de entorno por defecto
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Cambiar al usuario no-root para ejecutar la aplicación
+USER nestjs
+
+# Comando para ejecutar la aplicación usando el script de inicialización
+CMD ["./scripts/init.sh"]
