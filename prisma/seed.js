@@ -7,20 +7,41 @@ async function main() {
   console.log('🌱 Iniciando seed de la base de datos...');
 
   try {
-    // Limpiar datos existentes
+    // Limpiar datos existentes (en orden correcto para evitar violaciones de FK)
     console.log('🧹 Limpiando datos existentes...');
+    
+    // Primero eliminar tablas que dependen de otras
     await prisma.resultados_Riesgos_Detectados.deleteMany();
     await prisma.resultados_Plan_Accion.deleteMany();
     await prisma.resultados_Costos_Omitidos.deleteMany();
     await prisma.resultados_Costos_Analizados.deleteMany();
+    await prisma.resultados_Validacion_Costos.deleteMany();
+    
+    // Luego eliminar análisis que dependen de negocios
     await prisma.analisis_IA.deleteMany();
+    
+    // Eliminar progreso de negocios que depende de negocios y módulos
     await prisma.negocioProgresoPaso.deleteMany();
+    
+    // Eliminar registros financieros que dependen de negocios y módulos
     await prisma.registros_financieros.deleteMany();
+    
+    // Eliminar negocios que dependen de usuarios y tamaños
     await prisma.negocios.deleteMany();
+    
+    // Eliminar usuarios
     await prisma.usuarios.deleteMany();
+    
+    // Eliminar módulos que dependen de aprendizaje
     await prisma.modulos.deleteMany();
+    
+    // Eliminar aprendizaje
     await prisma.aprendizaje.deleteMany();
+    
+    // Eliminar estados
     await prisma.estados.deleteMany();
+    
+    // Eliminar tamaños de negocio
     await prisma.tamano_negocio.deleteMany();
 
     // Crear tamaños de negocio
