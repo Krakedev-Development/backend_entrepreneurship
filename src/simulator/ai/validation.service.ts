@@ -17,15 +17,15 @@ export class ValidationService {
     businessInfo: { tipoNegocio: string; tamano: string; ubicacion: string }
   ) {
     try {
-      console.log('🔍 [VALIDATION-SERVICE] Iniciando validación rápida...');
+      console.log('🔍 [VALIDATION-SERVICE] Iniciando validación...');
       
       // Generar prompt optimizado para validación rápida
       const prompt = this.promptService.generateValidationPrompt(costs, businessInfo);
       
-      console.log('📝 [VALIDATION-SERVICE] Prompt generado, llamando a IA...');
+      console.log('📝 [VALIDATION-SERVICE] Prompt generado: ', prompt, ' llamando a IA...');
       
       // Llamar a la IA con timeout más corto para validación rápida
-      const response = await this.aiService.analyzePrompt(prompt, 10000); // 10 segundos timeout
+      const response = await this.aiService.analyzePrompt(prompt, 30000); // 30 segundos timeout
       
       console.log('✅ [VALIDATION-SERVICE] Respuesta de IA recibida');
       

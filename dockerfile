@@ -1,18 +1,15 @@
-# Usar la imagen oficial de Node.js 20
-FROM node:20-alpine
-
-# Instalar dependencias del sistema necesarias
-RUN apk add --no-cache bash netcat-openbsd
+# Usar la imagen oficial de Node.js
+FROM node:18-alpine
 
 # Establecer el directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos de dependencias primero para aprovechar la caché de Docker
+# Copiar archivos de dependencias
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Instalar todas las dependencias (incluyendo devDependencies para la compilación)
-RUN npm ci --only=production=false
+# Instalar todas las dependencias (incluyendo devDependencies para compilar)
+RUN npm ci
 
 # Generar el cliente de Prisma
 RUN npx prisma generate
@@ -20,31 +17,21 @@ RUN npx prisma generate
 # Copiar el código fuente
 COPY . .
 
-# Hacer los scripts ejecutables
-RUN chmod +x scripts/*.sh
-
 # Compilar la aplicación
 RUN npm run build
 
 # Verificar que la compilación fue exitosa
 RUN ls -la dist/
 
-# Crear usuario no-root para seguridad
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nestjs -u 1001
-
-# Cambiar propiedad de los archivos al usuario no-root
-RUN chown -R nestjs:nodejs /app
+# Instalar solo dependencias de producción para la imagen final
+# Instalar solo dependencias de producción
+RUN npm ci --only=production
 
 # Exponer el puerto
 EXPOSE 3000
 
-# Variables de entorno por defecto
-ENV NODE_ENV=production
-ENV PORT=3000
+# Sobrescribir el ENTRYPOINT de la imagen base
+ENTRYPOINT []
 
-# Cambiar al usuario no-root para ejecutar la aplicación
-USER nestjs
-
-# Comando para ejecutar la aplicación usando el script de inicialización
-CMD ["./scripts/init.sh"]
+# Comando para ejecutar la aplicación
+CMD ["sh", "-c", "echo '🚀 [ENTRYPOINT] Iniciando aplicación...' && npx prisma migrate deploy && npx prisma generate && echo '🌱 Ejecutando seed...' && npm run seed && echo '🚀 [ENTRYPOINT] Iniciando aplicación NestJS...' && exec node dist/src/main"]

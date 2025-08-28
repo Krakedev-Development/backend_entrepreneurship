@@ -15,62 +15,107 @@ export class PromptService {
       .filter(Boolean)
       .join('\n');
 
-    return `Rol: Auditor financiero experto en validación de costos básicos para ${businessInfo.tipoNegocio} en ${businessInfo.ubicacion}.
+    return `Rol: Actúa como un auditor de datos financieros y analista de riesgos. Tu especialización es asegurar la calidad y precisión de la información financiera de entrada para emprendimientos en Ecuador, ${businessInfo.ubicacion}, antes de que sea utilizada en un análisis estratégico.
 
-Contexto: Analizando costos fijos básicos de un ${businessInfo.tipoNegocio} (${businessInfo.tamano}) ubicado en ${businessInfo.ubicacion}.
+Contexto: Soy un emprendedor con un negocio ${businessInfo.tamano} de tipo ${businessInfo.tipoNegocio} ubicado en ${businessInfo.ubicacion} y necesito tu ayuda para depurar mi lista de costos mensuales antes de que tu colega, el asesor financiero de élite, realice el diagnóstico completo. Tu misión es auditar mi lista y darme el visto bueno para proceder, o indicarme exactamente qué debo corregir.
 
-Costos proporcionados:
+Reglas de Validación:
+1.  **Exclusividad de Costos Fijos:** La lista solo debe contener costos fijos, es decir, aquellos que no varían significativamente con el volumen de ventas mes a mes. Costos como 'materia prima', 'compra de inventario', 'insumos' o 'packaging' son costos variables y deben ser marcados como inválidos.
+2.  **Costos Desagregados:** Cada ítem debe representar un único costo. No se aceptan costos agrupados como 'Servicios básicos e internet' o 'Marketing y permisos'. Deben ser listados por separado para un análisis preciso.
+3.  **Especificidad:** No se aceptan costos ambiguos o genéricos como 'Varios', 'Otros gastos' o 'Gastos administrativos'. Cada costo debe ser claramente identificable.
+4.  **Exclusión Explícita de Costos obligatorios:** Cualquier costo relacionado con compensación humana debe ser omitido, descartado y/o no incluido en los costos obligatorios para este análisis específico. Esto incluye pero no se limita a:
+
+Sueldos y salarios: Pagos fijos mensuales a empleados
+Honorarios profesionales: Pagos a consultores, asesores o profesionales independientes
+Nómina: Cualquier concepto incluido en la planilla de pagos
+Beneficios sociales: Décimo tercero, décimo cuarto, vacaciones, utilidades
+Aportes patronales: IESS, fondos de reserva, contribuciones obligatorias
+Bonificaciones: Incentivos, comisiones fijas, bonos de productividad
+Contratistas de servicios personales: Pagos a personas naturales por servicios específicos
+Capacitación de personal: Cursos, entrenamientos, desarrollo profesional
+Uniformes y equipos de trabajo: Vestimenta, herramientas personales, EPP
+
+**NO DEBES INCLUIR EN LOS COSTOS OBLIGATORIOS Cualquier costo relacionado con 'sueldos', 'honorarios', 'salarios' o 'nómina' INCLUSO SI SON ESCENCIALES**
+**NO DEBES INCLUIR EN LOS COSTOS OBLIGATORIOS Cualquier costo relacionado con 'contabilidad' INCLUSO SI SON ESCENCIALES**
+
+Justificación: Este análisis se enfoca exclusivamente en costos operativos mensuales no relacionados con personal para proporcionar una base de costos fijos que permita evaluar la viabilidad operativa independiente de las decisiones de contratación. Los costos de personal serán analizados en una fase posterior del proceso de planificación financiera.
+
+5.  **Verificación de Costos obligatorios faltantes:** Basado en el ${businessInfo.tipoNegocio} proporcionado, debes inferir los costos fijos críticos que fueron omitidos y mencionarlos en el resumen (en caso de haber alguno). En caso de existir costos obligatorios faltantes no se podrá proseguir con el analisis por lo que debes ser muy cauteloso al agregar alguno, recuerda que es un negocio pequeño y a lo mejor no es imperativo tener en cuenta estos costos, NO ESTAS OBLIGADO A INCLUIR COSTOS OBLIGATORIOS, SI CONSIDERAS QUE SE A PROPORCIONADO UNA LISTA ACEPTABLE DE COSTOS FIJOS DEJA LA SECCION DE COSTOS OBLIGATORIOS VACIA Y CENTRATE EN VALIDAR SUS VALORES. en tal caso puedes ponerlos en la seccion de recomendados, que no impiden que se prosiga con el analisis.
+6.  **Verificación de Costos recomendados faltantes:** Basado en el ${businessInfo.tipoNegocio} proporcionado, debes inferir los costos fijos no tan importantes (Mejoran eficiencia/rentabilidad pero no son críticos) que fueron omitidos y mencionarlos en el resumen (en caso de haber alguno). Estos costos son meramente informativos para el conocimiento del emprendedor por lo tanto no impiden que se prosiga con el analisis en caso de no ser incluidos.
+7.  **Verificación de costos realistas:** Parte crucial de tu trabajo es identificar los valores ilógicos (valores extremadamente altos o bajos). En caso de no cumplir con esta regla el costo debe ser marcado como invalido.
+
+Información a Validar:
+Tipo de Negocio: ${businessInfo.tipoNegocio}
+Ubicacion: ${businessInfo.ubicacion}
+Lista de Costos Proporcionada:
 ${listaCostos}
 
-Tarea: Validar EXACTAMENTE los 7 costos básicos obligatorios y identificar los que faltan.
+Tarea:
+Analiza cada costo en la lista proporcionada según las reglas de validación. Luego, determina si faltan costos obligatorios para el tipo de negocio. Evita incluir costos redundantes aparentemente obligatorios y adhierete firmemente a las reglas de validacion, en caso de que la lista de costos provista sea suficientemente robusta puedes no incluir la seccion de costos_obligatorios_faltantes. Finalmente, genera un veredicto que indique si puedo proceder con el análisis principal. Tu respuesta debe ser únicamente un objeto JSON que siga estrictamente la siguiente estructura. No incluyas ningún texto introductorio o explicaciones fuera del formato JSON.
 
-Reglas de Validación OBLIGATORIAS:
-1. **Solo estos 7 costos básicos**: Alquiler, Luz, Agua, Internet, Seguros, Patentes, Permisos
-2. **Excluir TODOS los demás**: Salarios, contabilidad, costos variables, costos operativos, servicios básicos, etc.
-3. **Validar cada costo recibido**: Si no es uno de los 7 básicos, marcarlo como inválido
-4. **Identificar faltantes**: Listar TODOS los costos básicos que no están en la lista proporcionada
-5. **Valores realistas**: Para ${businessInfo.ubicacion}, valores típicos:
-   - Alquiler: $500-2000/mes
-   - Luz: $50-200/mes
-   - Agua: $20-80/mes
-   - Internet: $30-100/mes
-   - Seguros: $50-300/mes
-   - Patentes: $100-500/año
-   - Permisos: $200-1000/año
 
-IMPORTANTE: Siempre verificar los mismos 7 costos básicos. No agregar ni quitar costos de esta lista.
+Formato de Respuesta:
 
-Responde SOLO JSON con estructura EXACTA:
 {
   "validacion_de_costos": [
     {
-      "costo_recibido": "nombre exacto del costo recibido",
-      "valor_recibido": "$valor",
-      "es_valido": true/false,
-      "justificacion": "Si es válido: 'Es uno de los 7 costos básicos obligatorios'. Si es inválido: 'No es uno de los 7 costos básicos obligatorios'",
-      "sugerencia_correccion": "Si es inválido: 'Reemplazar con uno de los 7 costos básicos: Alquiler, Luz, Agua, Internet, Seguros, Patentes, Permisos'",
-      "categoria": "costo básico"
+      "costo_recibido": "Costo1",
+      "valor_recibido": "$Valor1",
+      "es_valido": true,
+      "justificacion": "Válido. Es un costo fijo, específico y fundamental para el análisis."
+    },
+    {
+      "costo_recibido": "Costo2",
+      "valor_recibido": "$Valor2",
+      "es_valido": false,
+      "justificacion": "Inválido. Este costo es variable, no fijo. Su valor depende directamente de las ventas y la producción."
+    },
+    {
+      "costo_recibido": "Costo3",
+      "valor_recibido": "$Valor3",
+      "es_valido": false,
+      "justificacion": "Inválido. El término es ambiguo y agrupa múltiples costos. Se debe desglosar en ítems específicos."
+    },
+    {
+      "costo_recibido": "Costo4",
+      "valor_recibido": "$Valor4",
+      "es_valido": false,
+      "justificacion": "Inválido. Según las instrucciones, este tipo de costo debe ser excluido del análisis."
     }
   ],
   "costos_obligatorios_faltantes": [
     {
-      "nombre": "Nombre exacto del costo básico faltante (solo uno de los 7)",
-      "descripcion": "Descripción estándar del costo básico",
-      "motivo_critico": "Es obligatorio para operar legalmente en ${businessInfo.ubicacion}",
-      "valor_estimado": "Rango específico según la tabla de valores arriba",
-      "prioridad": "alta"
+      "nombre": "Costo Obligatorio 1",
+      "descripcion": "Descripción del costo obligatorio que debe incluirse por necesidad operativa.",
+      "motivo_critico": "Razón por la cual este costo es crítico y obligatorio para el funcionamiento del negocio."
+    },
+    {
+      "nombre": "Costo Obligatorio 2",
+      "descripcion": "Descripción del segundo costo obligatorio necesario para la operación.",
+      "motivo_critico": "Explicación de por qué es indispensable incluir este costo en el análisis."
+    }
+  ],
+  "costos_recomendados_faltantes": [
+    {
+      "nombre": "Costo Recomendado 1",
+      "descripcion": "Descripción del costo recomendado que mejora la operación del negocio.",
+      "beneficio": "Beneficio específico que aporta este costo al crecimiento y eficiencia del negocio."
+    },
+    {
+      "nombre": "Costo Recomendado 2",
+      "descripcion": "Descripción del segundo costo recomendado para optimizar operaciones.",
+      "beneficio": "Ventaja competitiva o mejora operativa que proporciona este costo al negocio."
     }
   ],
   "resumen_validacion": {
-    "mensaje_general": "Validación de los 7 costos básicos obligatorios completada",
-    "puede_proseguir_analisis": true/false,
-    "razones_para_no_proseguir": ["Lista específica de costos básicos faltantes"],
-    "acciones_requeridas": ["Agregar los costos básicos faltantes: [lista de nombres]"],
-    "puntuacion_global": "1-10 (10 = todos los 7 costos básicos presentes)"
+    "mensaje_general": "Se han detectado errores en la lista proporcionada. Por favor, corrígela siguiendo las justificaciones para cada ítem inválido. Adicionalmente, para este tipo de negocio, es crítico que no olvides incluir los costos obligatorios y recomendados listados. Estos son vitales para la protección y el crecimiento sostenible del negocio.",
+    "puede_proseguir_analisis": false
   }
 }
 
-NOTA: Siempre verificar los mismos 7 costos básicos. La respuesta debe ser consistente.`;
+Nota: Este formato tiene funciones exclusivamente informativas para el correcto formato de la respuesta. Por ningún motivo debe ser la respuesta recibida. Los textos genéricos deben ser reemplazados con contenido específico.
+
+  `;
   }
 
   /**
