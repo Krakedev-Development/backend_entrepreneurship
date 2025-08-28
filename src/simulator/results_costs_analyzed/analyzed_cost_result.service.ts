@@ -26,6 +26,31 @@ export class AnalyzedCostResultService {
     return this.mapper.toDomain(prismaResult);
   }
 
+  async createMultiple(createDtos: CreateAnalyzedCostResultDto[]): Promise<ResultadosCostosAnalizados[]> {
+    await this.prisma.resultados_Costos_Analizados.createMany({
+      data: createDtos.map(dto => ({
+        analisis_id: dto.analysisId,
+        nombre_costo: dto.costName,
+        valor_recibido: dto.receivedValue,
+        rango_estimado: dto.estimatedRange,
+        evaluacion: dto.evaluation,
+        comentario: dto.comment,
+      })),
+    });
+    
+    // Retornar los resultados creados
+    const createdResults = await this.prisma.resultados_Costos_Analizados.findMany({
+      where: {
+        analisis_id: { in: createDtos.map(dto => dto.analysisId) },
+        nombre_costo: { in: createDtos.map(dto => dto.costName) },
+      },
+      orderBy: { resultado_costo_id: 'desc' },
+      take: createDtos.length,
+    });
+    
+    return createdResults.map(this.mapper.toDomain);
+  }
+
   async findAll(): Promise<ResultadosCostosAnalizados[]> {
     const prismaResults = await this.prisma.resultados_Costos_Analizados.findMany();
     return prismaResults.map(this.mapper.toDomain);

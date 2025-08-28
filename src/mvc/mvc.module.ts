@@ -15,6 +15,7 @@ import { UserController } from './controllers/user.controller';
 import { AprendizajeController, ModuloController } from './controllers/aprendizaje.controller';
 import { ValidationResultController } from './controllers/validation-result.controller';
 import { BusinessProgressStepController } from './controllers/business-progress-step.controller';
+import { AnalyzedCostResultController } from '../simulator/results_costs_analyzed/analyzed_cost_result.controller';
 
 // Services
 import { BusinessService } from './services/business.service';
@@ -28,6 +29,7 @@ import { UserService } from './services/user.service';
 import { AprendizajeService } from './services/aprendizaje.service';
 import { ValidationResultService } from './services/validation-result.service';
 import { BusinessProgressStepService } from './services/business-progress-step.service';
+import { AnalyzedCostResultService } from '../simulator/results_costs_analyzed/analyzed_cost_result.service';
 
 // Mappers
 import { BusinessMapper } from './models/mappers/business.mapper';
@@ -41,6 +43,7 @@ import { UserMapper } from './models/mappers/user.mapper';
 import { AprendizajeMapper } from './models/mappers/aprendizaje.mapper';
 import { ModuloMapper } from './models/mappers/modulo.mapper';
 import { ValidationResultMapper } from './models/mappers/validation-result.mapper';
+import { AnalyzedCostResultMapper } from '../simulator/results_costs_analyzed/mappers/analyzed_cost_result.mapper';
 
 @Module({
   imports: [ConfigModule, AiModule, PrismaModule],
@@ -57,6 +60,7 @@ import { ValidationResultMapper } from './models/mappers/validation-result.mappe
     ModuloController,
     ValidationResultController,
     BusinessProgressStepController,
+    AnalyzedCostResultController,
   ],
   providers: [
     BusinessService,
@@ -70,6 +74,7 @@ import { ValidationResultMapper } from './models/mappers/validation-result.mappe
     AprendizajeService,
     ValidationResultService,
     BusinessProgressStepService,
+    AnalyzedCostResultService,
     BusinessMapper,
     LearningMapper,
     SizeMapper,
@@ -81,6 +86,7 @@ import { ValidationResultMapper } from './models/mappers/validation-result.mappe
     AprendizajeMapper,
     ModuloMapper,
     ValidationResultMapper,
+    AnalyzedCostResultMapper,
   ],
   exports: [
     BusinessService,

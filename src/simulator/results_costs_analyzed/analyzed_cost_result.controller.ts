@@ -1,8 +1,14 @@
 import { Controller, Get, Post, Body, Param, ParseIntPipe, Patch, Delete, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiProperty } from '@nestjs/swagger';
 import { AnalyzedCostResultService } from './analyzed_cost_result.service';
 import { CreateAnalyzedCostResultDto } from './dto/create-results_costs_analyzed.dto';
 import { UpdateAnalyzedCostResultDto } from './dto/update-results_costs_analyzed.dto';
+
+// DTO para crear múltiples resultados
+export class CreateMultipleAnalyzedCostResultsDto {
+  @ApiProperty({ description: 'Array de resultados de análisis de costos', type: [CreateAnalyzedCostResultDto] })
+  results: CreateAnalyzedCostResultDto[];
+}
 
 @ApiTags('Analyzed Costs')
 @Controller('analyzed-costs')
@@ -14,6 +20,13 @@ export class AnalyzedCostResultController {
   @ApiResponse({ status: 201, description: 'The analyzed cost result was successfully created.' })
   create(@Body() createDto: CreateAnalyzedCostResultDto) {
     return this.service.create(createDto);
+  }
+
+  @Post('multiple')
+  @ApiOperation({ summary: 'Create multiple analyzed cost results' })
+  @ApiResponse({ status: 201, description: 'The analyzed cost results were successfully created.' })
+  createMultiple(@Body() createDto: CreateMultipleAnalyzedCostResultsDto) {
+    return this.service.createMultiple(createDto.results);
   }
 
   @Get()
