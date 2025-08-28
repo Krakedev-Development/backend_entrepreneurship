@@ -14,7 +14,14 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
+  app.useGlobalPipes(new ValidationPipe({ 
+    whitelist: true, 
+    forbidNonWhitelisted: false,
+    transform: true,
+    transformOptions: {
+      enableImplicitConversion: true,
+    },
+  }));
   app.setGlobalPrefix('api/v1');
    // --- CONFIGURACIÓN DE SWAGGER ---
 

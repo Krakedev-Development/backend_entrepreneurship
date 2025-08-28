@@ -29,21 +29,7 @@ export class BusinessController {
   @ApiResponse({ status: 500, description: 'Error interno del servidor.' })
   async create(@Body() createBusinessDto: CreateBusinessDto) {
     try {
-      console.log('🏢 [BACKEND] POST /negocios - Creando negocio con datos:', createBusinessDto);
-      console.log('🔍 [BACKEND] Tipo de datos recibidos:', typeof createBusinessDto);
-      console.log('🔍 [BACKEND] Propiedades del DTO:', Object.keys(createBusinessDto));
-      console.log('🔍 [BACKEND] Valores del DTO:', Object.values(createBusinessDto));
-      console.log('🔍 [BACKEND] Verificación de tipos:');
-      console.log('  - usuarioId:', typeof createBusinessDto.usuarioId, 'valor:', createBusinessDto.usuarioId);
-      console.log('  - tipoNegocio:', typeof createBusinessDto.tipoNegocio, 'valor:', createBusinessDto.tipoNegocio);
-      console.log('  - nombreNegocio:', typeof createBusinessDto.nombreNegocio, 'valor:', createBusinessDto.nombreNegocio);
-      console.log('  - ubicacion:', typeof createBusinessDto.ubicacion, 'valor:', createBusinessDto.ubicacion);
-      console.log('  - idTamano:', typeof createBusinessDto.idTamano, 'valor:', createBusinessDto.idTamano);
-      
       const result = await this.businessService.createBuisness(createBusinessDto);
-      
-      console.log('✅ [BACKEND] Negocio creado exitosamente:', result);
-      
       return result;
     } catch (error) {
       console.error('💥 [BACKEND] Error al crear negocio:', error);
@@ -82,12 +68,7 @@ export class BusinessController {
   @ApiResponse({ status: 500, description: 'Error interno del servidor.' })
   async findAll() {
     try {
-      console.log('📋 [BACKEND] GET /negocios - Solicitando todos los negocios');
-      
       const result = await this.businessService.findAllBuisness();
-      
-      console.log(`✅ [BACKEND] Se encontraron ${result.length} negocios:`, result);
-      
       return result;
     } catch (error) {
       console.error('💥 [BACKEND] Error al obtener negocios:', error);
@@ -106,15 +87,10 @@ export class BusinessController {
   @ApiResponse({ status: 500, description: 'Error interno del servidor.' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     try {
-      console.log(`🔍 [BACKEND] GET /negocios/${id} - Buscando negocio por ID`);
-      
       const business = await this.businessService.findById(id);
       if (!business) {
-        console.log(`❌ [BACKEND] Negocio con ID ${id} no encontrado`);
         throw new HttpException('Negocio no encontrado', HttpStatus.NOT_FOUND);
       }
-      
-      console.log(`✅ [BACKEND] Negocio encontrado:`, business);
       return business;
     } catch (error) {
       console.error(`💥 [BACKEND] Error al buscar negocio con ID ${id}:`, error);
@@ -135,12 +111,7 @@ export class BusinessController {
   @ApiResponse({ status: 200, description: 'Lista de negocios del usuario.' })
   async findByUsuario(@Param('usuarioId', ParseIntPipe) usuarioId: number) {
     try {
-      console.log(`👤 [BACKEND] GET /negocios/usuario/${usuarioId} - Buscando negocios del usuario`);
-      
       const result = await this.businessService.findBuisnessByIdUser(usuarioId);
-      
-      console.log(`✅ [BACKEND] Se encontraron ${result.length} negocios para el usuario ${usuarioId}:`, result);
-      
       return result;
     } catch (error) {
       console.error(`💥 [BACKEND] Error al buscar negocios del usuario ${usuarioId}:`, error);
@@ -153,12 +124,7 @@ export class BusinessController {
   @ApiResponse({ status: 200, description: 'Lista de usuarios.' })
   async getUsuarios() {
     try {
-      console.log('🔍 [BACKEND] GET /negocios/debug/usuarios - Obteniendo usuarios para debugging');
-      
       const usuarios = await this.businessService.getUsuarios();
-      
-      console.log(`✅ [BACKEND] Se encontraron ${usuarios.length} usuarios:`, usuarios);
-      
       return usuarios;
     } catch (error) {
       console.error('💥 [BACKEND] Error al obtener usuarios:', error);

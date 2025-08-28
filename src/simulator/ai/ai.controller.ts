@@ -1,5 +1,5 @@
-import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { Controller, Post, Body, Get, Param, ParseIntPipe, HttpException, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 import { IsArray, IsObject, IsString, ValidateNested, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { AiService } from './ai.service';
@@ -138,6 +138,71 @@ export class AiController {
       console.error('💥 [BACKEND-AI] Error en análisis final:', error);
       throw new HttpException(
         'Error al realizar el análisis final',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('save-complete-results')
+  @ApiOperation({ summary: 'Guardar todos los resultados de análisis en la base de datos' })
+  @ApiResponse({ status: 201, description: 'Resultados guardados exitosamente.' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos.' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor.' })
+  async saveCompleteResults(@Body() saveDto: {
+    negocioId: number;
+    moduloId: number;
+    analisisId: number;
+    costosAnalizados: any[];
+    riesgosDetectados: any[];
+    planAccion: any[];
+    resumenAnalisis?: any;
+  }) {
+    try {
+      console.log('💾 [BACKEND-AI] Guardando resultados completos...');
+      
+      const result = await this.analysisService.saveCompleteAnalysisResults(
+        saveDto.negocioId,
+        saveDto.moduloId,
+        saveDto.analisisId,
+        saveDto.costosAnalizados,
+        saveDto.riesgosDetectados,
+        saveDto.planAccion,
+        saveDto.resumenAnalisis
+      );
+      
+      console.log('✅ [BACKEND-AI] Resultados guardados exitosamente');
+      return result;
+    } catch (error) {
+      console.error('💥 [BACKEND-AI] Error al guardar resultados:', error);
+      throw new HttpException(
+        'Error al guardar los resultados',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('get-complete-results/:negocioId/:moduloId')
+  @ApiOperation({ summary: 'Obtener resultados completos de análisis guardados' })
+  @ApiParam({ name: 'negocioId', description: 'ID del negocio' })
+  @ApiParam({ name: 'moduloId', description: 'ID del módulo' })
+  @ApiResponse({ status: 200, description: 'Resultados obtenidos exitosamente.' })
+  @ApiResponse({ status: 404, description: 'Resultados no encontrados.' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor.' })
+  async getCompleteResults(
+    @Param('negocioId', ParseIntPipe) negocioId: number,
+    @Param('moduloId', ParseIntPipe) moduloId: number
+  ) {
+    try {
+      console.log(`🔍 [BACKEND-AI] Obteniendo resultados para negocio ${negocioId} y módulo ${moduloId}`);
+      
+      const result = await this.analysisService.getCompleteAnalysisResults(negocioId, moduloId);
+      
+      console.log('✅ [BACKEND-AI] Resultados obtenidos exitosamente');
+      return result;
+    } catch (error) {
+      console.error('💥 [BACKEND-AI] Error al obtener resultados:', error);
+      throw new HttpException(
+        'Error al obtener los resultados',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

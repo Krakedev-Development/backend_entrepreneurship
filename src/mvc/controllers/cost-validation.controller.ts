@@ -3,9 +3,9 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ValidationResultService } from '../services/validation-result.service';
 import { SaveValidationResultDto } from '../models/dto/save-validation-result.dto';
 
-@ApiTags('Validation Results')
-@Controller('validation-results')
-export class ValidationResultController {
+@ApiTags('Cost Validation')
+@Controller('cost-validation')
+export class CostValidationController {
   constructor(private readonly validationResultService: ValidationResultService) {}
 
   @Post()

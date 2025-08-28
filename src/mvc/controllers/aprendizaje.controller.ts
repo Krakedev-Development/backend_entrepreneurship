@@ -20,15 +20,9 @@ export class AprendizajeController {
   @ApiResponse({ status: 500, description: 'Error interno del servidor.' })
   async findAll() {
     try {
-      console.log('📚 [BACKEND] GET /aprendizaje - Solicitando todos los aprendizajes');
-      
       const result = await this.aprendizajeService.findAllAprendizajes();
-      
-      console.log(`✅ [BACKEND] Se encontraron ${result.length} aprendizajes:`, result);
-      
       return result;
     } catch (error) {
-      console.error('💥 [BACKEND] Error al obtener aprendizajes:', error);
       throw new HttpException(
         'Error al obtener la lista de aprendizajes',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -44,14 +38,9 @@ export class AprendizajeController {
   @ApiResponse({ status: 500, description: 'Error interno del servidor.' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     try {
-      console.log(`🔍 [BACKEND] GET /aprendizaje/${id} - Buscando aprendizaje por ID`);
-      
       const aprendizaje = await this.aprendizajeService.findAprendizajeById(id);
-      
-      console.log(`✅ [BACKEND] Aprendizaje encontrado:`, aprendizaje);
       return aprendizaje;
     } catch (error) {
-      console.error(`💥 [BACKEND] Error al buscar aprendizaje con ID ${id}:`, error);
       if (error instanceof HttpException) {
         throw error;
       }
@@ -70,15 +59,9 @@ export class AprendizajeController {
   @ApiResponse({ status: 500, description: 'Error interno del servidor.' })
   async findModulosByAprendizaje(@Param('id', ParseIntPipe) id: number) {
     try {
-      console.log(`📚 [BACKEND] GET /aprendizaje/${id}/modulos - Buscando módulos del aprendizaje`);
-      
       const modulos = await this.aprendizajeService.findModulosByAprendizajeId(id);
-      
-      console.log(`✅ [BACKEND] Se encontraron ${modulos.length} módulos para el aprendizaje ${id}:`, modulos);
-      
       return modulos;
     } catch (error) {
-      console.error(`💥 [BACKEND] Error al buscar módulos del aprendizaje ${id}:`, error);
       if (error instanceof HttpException) {
         throw error;
       }
@@ -101,15 +84,9 @@ export class AprendizajeController {
     @Param('negocioId', ParseIntPipe) negocioId: number
   ) {
     try {
-      console.log(`📊 [BACKEND] GET /aprendizaje/${aprendizajeId}/modulos/${negocioId}/progreso - Obteniendo módulos con progreso`);
-      
       const modulosWithProgress = await this.aprendizajeService.getModulosWithProgress(aprendizajeId, negocioId);
-      
-      console.log(`✅ [BACKEND] Módulos con progreso obtenidos:`, modulosWithProgress);
-      
       return modulosWithProgress;
     } catch (error) {
-      console.error(`💥 [BACKEND] Error al obtener módulos con progreso:`, error);
       if (error instanceof HttpException) {
         throw error;
       }
@@ -134,14 +111,9 @@ export class ModuloController {
   @ApiResponse({ status: 500, description: 'Error interno del servidor.' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     try {
-      console.log(`🔍 [BACKEND] GET /modulos/${id} - Buscando módulo por ID`);
-      
       const modulo = await this.aprendizajeService.findModuloById(id);
-      
-      console.log(`✅ [BACKEND] Módulo encontrado:`, modulo);
       return modulo;
     } catch (error) {
-      console.error(`💥 [BACKEND] Error al buscar módulo con ID ${id}:`, error);
       if (error instanceof HttpException) {
         throw error;
       }

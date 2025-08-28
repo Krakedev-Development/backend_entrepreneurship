@@ -49,6 +49,14 @@ export class AnalisisIAController {
     return this.analisisIAService.update(id, updateDto);
   }
 
+  @Post('verify-or-create/:negocioId')
+  @ApiOperation({ summary: 'Verify if analysis exists for business, create if not' })
+  @ApiParam({ name: 'negocioId', description: 'The business ID to check/create analysis for' })
+  @ApiResponse({ status: 200, description: 'Analysis verified or created successfully.' })
+  async verifyOrCreate(@Param('negocioId', ParseIntPipe) negocioId: number) {
+    return this.analisisIAService.verifyOrCreate(negocioId);
+  }
+
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a analysis ai by its ID' })
   @ApiParam({ name: 'id', description: 'The ID of the analysis ai to delete' })

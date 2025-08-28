@@ -57,5 +57,31 @@ export class AnalisisIAService {
     const progressPrisma = await this.prisma.analisis_IA.findMany();
     return progressPrisma.map(this.mapper.toDomain);
   }
+
+  async verifyOrCreate(negocioId: number): Promise<AnalisisIA> {
+    console.log('🔍 [ANALISIS-SERVICE] Verificando análisis para negocio:', negocioId);
+    
+    // Buscar si ya existe un análisis para este negocio
+    const existingAnalisis = await this.prisma.analisis_IA.findFirst({
+      where: { negocio_id: negocioId }
+    });
+    
+    if (existingAnalisis) {
+      console.log('✅ [ANALISIS-SERVICE] Análisis encontrado:', existingAnalisis.analisis_id);
+      return this.mapper.toDomain(existingAnalisis);
+    }
+    
+    // Si no existe, crear uno nuevo
+    console.log('🔍 [ANALISIS-SERVICE] Creando nuevo análisis para negocio:', negocioId);
+    const newAnalisis = await this.prisma.analisis_IA.create({
+      data: {
+        negocio_id: negocioId,
+        fecha_analisis: new Date(),
+      }
+    });
+    
+    console.log('✅ [ANALISIS-SERVICE] Nuevo análisis creado:', newAnalisis.analisis_id);
+    return this.mapper.toDomain(newAnalisis);
+  }
 }
 

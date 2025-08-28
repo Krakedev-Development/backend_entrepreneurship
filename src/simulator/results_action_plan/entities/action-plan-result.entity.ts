@@ -1,21 +1,21 @@
 export class ActionPlanResult {
   id?: number;
-  analysisId: number;
-  title: string;
-  description: string;
-  priority: string;
+  analisisId: number;
+  titulo: string;
+  descripcion: string;
+  prioridad: string;
 
   constructor(
-    analysisId: number,
-    title: string,
-    description: string,
-    priority: string,
+    analisisId: number,
+    titulo: string,
+    descripcion: string,
+    prioridad: string,
     id?: number,
   ) {
     this.id = id;
-    this.analysisId = analysisId;
-    this.title = title;
-    this.description = description;
-    this.priority = priority;
+    this.analisisId = analisisId;
+    this.titulo = titulo;
+    this.descripcion = descripcion;
+    this.prioridad = prioridad;
   }
 }

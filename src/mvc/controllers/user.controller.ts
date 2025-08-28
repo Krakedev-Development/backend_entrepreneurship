@@ -27,12 +27,7 @@ export class UserController {
   @ApiResponse({ status: 409, description: 'El email ya está registrado.' })
   async register(@Body() createUserDto: CreateUserDto) {
     try {
-      console.log('👤 [BACKEND] POST /usuarios/registro - Registrando usuario:', createUserDto);
-      
       const result = await this.userService.register(createUserDto);
-      
-      console.log('✅ [BACKEND] Usuario registrado exitosamente:', result);
-      
       return result;
     } catch (error) {
       console.error('💥 [BACKEND] Error al registrar usuario:', error);
@@ -54,12 +49,7 @@ export class UserController {
   @ApiResponse({ status: 401, description: 'Credenciales inválidas.' })
   async login(@Body() loginUserDto: LoginUserDto) {
     try {
-      console.log('🔐 [BACKEND] POST /usuarios/login - Iniciando sesión:', loginUserDto.email);
-      
       const result = await this.userService.login(loginUserDto);
-      
-      console.log('✅ [BACKEND] Login exitoso para usuario:', result.usuarioId);
-      
       return result;
     } catch (error) {
       console.error('💥 [BACKEND] Error en login:', error);
@@ -79,15 +69,10 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'Usuario no encontrado.' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     try {
-      console.log(`🔍 [BACKEND] GET /usuarios/${id} - Buscando usuario por ID`);
-      
       const user = await this.userService.findById(id);
       if (!user) {
-        console.log(`❌ [BACKEND] Usuario con ID ${id} no encontrado`);
         throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
       }
-      
-      console.log(`✅ [BACKEND] Usuario encontrado:`, user);
       return user;
     } catch (error) {
       console.error(`💥 [BACKEND] Error al buscar usuario con ID ${id}:`, error);
@@ -106,12 +91,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Lista de usuarios obtenida con éxito.' })
   async findAll() {
     try {
-      console.log('📋 [BACKEND] GET /usuarios - Solicitando todos los usuarios');
-      
       const result = await this.userService.findAll();
-      
-      console.log(`✅ [BACKEND] Se encontraron ${result.length} usuarios:`, result);
-      
       return result;
     } catch (error) {
       console.error('💥 [BACKEND] Error al obtener usuarios:', error);

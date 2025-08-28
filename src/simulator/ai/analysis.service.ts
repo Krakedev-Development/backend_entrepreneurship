@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { AiService } from './ai.service';
 import { PromptService } from './prompt.service';
+import { CompleteAnalysisResultService } from '../../mvc/services/complete-analysis-result.service';
 
 @Injectable()
 export class AnalysisService {
   constructor(
     private readonly aiService: AiService,
     private readonly promptService: PromptService,
+    private readonly completeAnalysisResultService: CompleteAnalysisResultService
   ) {}
 
   /**
@@ -131,5 +133,67 @@ export class AnalysisService {
         timestamp: new Date().toISOString()
       }
     };
+  }
+
+  async saveCompleteAnalysisResults(
+    negocioId: number,
+    moduloId: number,
+    analisisId: number,
+    costosAnalizados: any[],
+    riesgosDetectados: any[],
+    planAccion: any[],
+    resumenAnalisis?: any
+  ): Promise<any> {
+    console.log('💾 [ANALYSIS-SERVICE] Guardando resultados completos de análisis');
+    console.log('📊 [ANALYSIS-SERVICE] Negocio ID:', negocioId);
+    console.log('📚 [ANALYSIS-SERVICE] Módulo ID:', moduloId);
+    console.log('🤖 [ANALYSIS-SERVICE] Análisis ID:', analisisId);
+
+    try {
+      const result = await this.completeAnalysisResultService.saveCompleteAnalysis(
+        negocioId,
+        moduloId,
+        analisisId,
+        costosAnalizados,
+        riesgosDetectados,
+        planAccion,
+        resumenAnalisis
+      );
+
+      console.log('✅ [ANALYSIS-SERVICE] Resultados guardados exitosamente');
+      return {
+        success: true,
+        message: 'Resultados de análisis guardados exitosamente',
+        data: result
+      };
+    } catch (error) {
+      console.error('❌ [ANALYSIS-SERVICE] Error al guardar resultados:', error);
+      throw new InternalServerErrorException('Error al guardar los resultados de análisis');
+    }
+  }
+
+  async getCompleteAnalysisResults(negocioId: number, moduloId: number): Promise<any> {
+    console.log(`🔍 [ANALYSIS-SERVICE] Obteniendo resultados para negocio ${negocioId} y módulo ${moduloId}`);
+
+    try {
+      const result = await this.completeAnalysisResultService.findByNegocioAndModulo(negocioId, moduloId);
+      
+      if (!result) {
+        return {
+          success: false,
+          message: 'No se encontraron resultados de análisis para este negocio y módulo',
+          data: null
+        };
+      }
+
+      return {
+        success: true,
+        message: 'Resultados de análisis encontrados',
+        data: result
+      };
+    } catch (error) {
+      console.error('❌ [ANALYSIS-SERVICE] Error al obtener resultados:', error);
+      throw new InternalServerErrorException('Error al obtener los resultados de análisis');
+    }
   }
 }

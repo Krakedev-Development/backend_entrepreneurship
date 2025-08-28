@@ -27,22 +27,68 @@ export class AnalyzedCostResultService {
   }
 
   async createMultiple(createDtos: CreateAnalyzedCostResultDto[]): Promise<ResultadosCostosAnalizados[]> {
-    await this.prisma.resultados_Costos_Analizados.createMany({
-      data: createDtos.map(dto => ({
-        analisis_id: dto.analysisId,
+    // Validar que el array no esté vacío
+    if (!createDtos || createDtos.length === 0) {
+      throw new Error('No se proporcionaron datos para crear los resultados de análisis');
+    }
+
+    // Verificar que todos los DTOs tengan el mismo analysisId
+    const analysisId = createDtos[0].analysisId;
+    if (!analysisId) {
+      throw new Error('El ID de análisis es requerido');
+    }
+
+    // Verificar que todos los DTOs tengan el mismo analysisId
+    const allSameAnalysisId = createDtos.every(dto => dto.analysisId === analysisId);
+    if (!allSameAnalysisId) {
+      throw new Error('Todos los resultados deben pertenecer al mismo análisis');
+    }
+
+    // Verificar si ya existe un análisis para este negocio
+    const existingAnalysis = await this.prisma.analisis_IA.findFirst({
+      where: { negocio_id: analysisId }
+    });
+    
+    let analisisId: number;
+    
+    if (existingAnalysis) {
+      // Usar el análisis existente
+      analisisId = existingAnalysis.analisis_id;
+    } else {
+      // Crear un nuevo análisis para el negocio
+      const newAnalysis = await this.prisma.analisis_IA.create({
+        data: {
+          negocio_id: analysisId,
+          fecha_analisis: new Date()
+        }
+      });
+      analisisId = newAnalysis.analisis_id;
+    }
+    
+    const dataToInsert = createDtos.map(dto => {
+      // Validar que los campos requeridos estén presentes
+      if (!dto.costName) {
+        throw new Error('El nombre del costo es requerido');
+      }
+      
+      return {
+        analisis_id: analisisId, // Usar el ID del análisis (nuevo o existente)
         nombre_costo: dto.costName,
-        valor_recibido: dto.receivedValue,
-        rango_estimado: dto.estimatedRange,
-        evaluacion: dto.evaluation,
-        comentario: dto.comment,
-      })),
+        valor_recibido: dto.receivedValue || null,
+        rango_estimado: dto.estimatedRange || null,
+        evaluacion: dto.evaluation || null,
+        comentario: dto.comment || null,
+      };
+    });
+    
+    await this.prisma.resultados_Costos_Analizados.createMany({
+      data: dataToInsert,
     });
     
     // Retornar los resultados creados
     const createdResults = await this.prisma.resultados_Costos_Analizados.findMany({
       where: {
-        analisis_id: { in: createDtos.map(dto => dto.analysisId) },
-        nombre_costo: { in: createDtos.map(dto => dto.costName) },
+        analisis_id: analisisId,
       },
       orderBy: { resultado_costo_id: 'desc' },
       take: createDtos.length,

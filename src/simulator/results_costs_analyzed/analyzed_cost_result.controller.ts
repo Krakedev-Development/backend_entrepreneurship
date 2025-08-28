@@ -22,11 +22,92 @@ export class AnalyzedCostResultController {
     return this.service.create(createDto);
   }
 
+  @Post('test')
+  @ApiOperation({ summary: 'Test endpoint for validation' })
+  @ApiResponse({ status: 200, description: 'Validation test successful.' })
+  testValidation(@Body() createDto: CreateAnalyzedCostResultDto) {
+    return { message: 'Validation successful', data: createDto };
+  }
+
+  @Post('test-multiple')
+  @ApiOperation({ summary: 'Test endpoint for multiple validation' })
+  @ApiResponse({ status: 200, description: 'Multiple validation test successful.' })
+  testMultipleValidation(@Body() createDto: CreateMultipleAnalyzedCostResultsDto) {
+    return { 
+      message: 'Multiple validation test successful', 
+      receivedData: createDto,
+      resultsCount: createDto?.results?.length || 0
+    };
+  }
+
   @Post('multiple')
   @ApiOperation({ summary: 'Create multiple analyzed cost results' })
   @ApiResponse({ status: 201, description: 'The analyzed cost results were successfully created.' })
-  createMultiple(@Body() createDto: CreateMultipleAnalyzedCostResultsDto) {
-    return this.service.createMultiple(createDto.results);
+  @ApiResponse({ status: 400, description: 'Invalid data provided.' })
+  async createMultiple(@Body() createDto: any) {
+    try {
+      console.log('🔍 [CONTROLLER] ===== DATOS RECIBIDOS =====');
+      console.log('🔍 [CONTROLLER] createDto completo:', JSON.stringify(createDto, null, 2));
+      console.log('🔍 [CONTROLLER] Tipo de createDto:', typeof createDto);
+      console.log('🔍 [CONTROLLER] createDto.results:', createDto?.results);
+      console.log('🔍 [CONTROLLER] Tipo de results:', typeof createDto?.results);
+      console.log('🔍 [CONTROLLER] Es array:', Array.isArray(createDto?.results));
+      console.log('🔍 [CONTROLLER] Longitud:', createDto?.results?.length);
+      
+      // Validar que el DTO y los resultados estén presentes
+      if (!createDto) {
+        console.log('❌ [CONTROLLER] createDto es null/undefined');
+        throw new Error('Se requiere un objeto con datos para crear múltiples análisis de costos');
+      }
+
+      if (!createDto.results) {
+        console.log('❌ [CONTROLLER] createDto.results es null/undefined');
+        throw new Error('Se requiere un array de resultados para crear múltiples análisis de costos');
+      }
+
+      // Validar que el array no esté vacío
+      if (!Array.isArray(createDto.results)) {
+        console.log('❌ [CONTROLLER] results no es un array:', typeof createDto.results);
+        throw new Error('El campo "results" debe ser un array');
+      }
+
+      if (createDto.results.length === 0) {
+        console.log('❌ [CONTROLLER] array de results está vacío');
+        throw new Error('El array de resultados no puede estar vacío');
+      }
+
+      console.log('✅ [CONTROLLER] Validaciones pasadas, procesando datos...');
+      console.log('✅ [CONTROLLER] Primer elemento:', createDto.results[0]);
+
+      // Validar que cada elemento del array tenga los campos requeridos
+      for (let i = 0; i < createDto.results.length; i++) {
+        const result = createDto.results[i];
+        if (!result.analysisId) {
+          throw new Error(`El elemento ${i + 1} debe tener un analysisId válido`);
+        }
+        if (!result.costName) {
+          throw new Error(`El elemento ${i + 1} debe tener un costName válido`);
+        }
+      }
+
+      console.log('✅ [CONTROLLER] Llamando al servicio...');
+      const result = await this.service.createMultiple(createDto.results);
+      console.log('✅ [CONTROLLER] Servicio completado, retornando respuesta...');
+      
+      return {
+        success: true,
+        message: `${result.length} resultados de análisis creados exitosamente`,
+        data: result
+      };
+    } catch (error) {
+      console.error('❌ [CONTROLLER] Error en createMultiple:', error);
+      return {
+        success: false,
+        message: error.message || 'Error al crear los resultados de análisis',
+        error: error.message,
+        receivedData: createDto
+      };
+    }
   }
 
   @Get()

@@ -12,8 +12,6 @@ export class ValidationResultService {
   ) {}
 
   async saveValidationResult(saveDto: SaveValidationResultDto): Promise<ValidationResult> {
-    console.log('💾 [VALIDATION-SERVICE] Guardando resultado de validación:', saveDto);
-
     const validationResultPrisma = await this.prisma.resultados_Validacion_Costos.create({
       data: {
         negocio_id: saveDto.negocioId,
@@ -26,14 +24,10 @@ export class ValidationResultService {
       },
     });
 
-    console.log('✅ [VALIDATION-SERVICE] Resultado de validación guardado:', validationResultPrisma);
-
     return this.mapper.toDomain(validationResultPrisma);
   }
 
   async getValidationResultByBusinessAndModule(negocioId: number, moduloId: number): Promise<ValidationResult | null> {
-    console.log(`🔍 [VALIDATION-SERVICE] Buscando validación para negocio ${negocioId} y módulo ${moduloId}`);
-
     const validationResultPrisma = await this.prisma.resultados_Validacion_Costos.findFirst({
       where: {
         negocio_id: negocioId,
@@ -45,17 +39,13 @@ export class ValidationResultService {
     });
 
     if (!validationResultPrisma) {
-      console.log('❌ [VALIDATION-SERVICE] No se encontró validación');
       return null;
     }
 
-    console.log('✅ [VALIDATION-SERVICE] Validación encontrada:', validationResultPrisma);
     return this.mapper.toDomain(validationResultPrisma);
   }
 
   async getValidationResultsByBusiness(negocioId: number): Promise<ValidationResult[]> {
-    console.log(`🔍 [VALIDATION-SERVICE] Buscando todas las validaciones del negocio ${negocioId}`);
-
     const validationResultsPrisma = await this.prisma.resultados_Validacion_Costos.findMany({
       where: {
         negocio_id: negocioId,
@@ -65,7 +55,6 @@ export class ValidationResultService {
       },
     });
 
-    console.log(`✅ [VALIDATION-SERVICE] Encontradas ${validationResultsPrisma.length} validaciones`);
     return validationResultsPrisma.map(result => this.mapper.toDomain(result));
   }
 }

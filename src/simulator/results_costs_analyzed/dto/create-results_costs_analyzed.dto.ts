@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAnalyzedCostResultDto {
@@ -14,21 +15,25 @@ export class CreateAnalyzedCostResultDto {
 
   @ApiProperty({ description: 'Valor del costo reportado por el usuario', example: '$500' })
   @IsString()
-  @IsNotEmpty()
-  receivedValue: string;
+  @IsOptional()
+  @Transform(({ value }) => value === '' ? null : value)
+  receivedValue?: string;
 
   @ApiProperty({ description: 'Rango estimado de valor para el costo', example: '$450 - $600' })
   @IsString()
-  @IsNotEmpty()
-  estimatedRange: string;
+  @IsOptional()
+  @Transform(({ value }) => value === '' ? null : value)
+  estimatedRange?: string;
 
   @ApiProperty({ description: 'Evaluación del valor del costo (ej. "En rango", "Alto", "Bajo")', example: 'En rango' })
   @IsString()
-  @IsNotEmpty()
-  evaluation: string;
+  @IsOptional()
+  @Transform(({ value }) => value === '' ? null : value)
+  evaluation?: string;
 
   @ApiProperty({ description: 'Comentario o recomendación sobre el costo', example: 'Tu gasto en marketing digital es competitivo para el mercado.' })
   @IsString()
-  @IsNotEmpty()
-  comment: string;
+  @IsOptional()
+  @Transform(({ value }) => value === '' ? null : value)
+  comment?: string;
 }

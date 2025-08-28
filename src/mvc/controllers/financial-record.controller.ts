@@ -45,7 +45,6 @@ export class FinancialRecordController {
     @Param('businessId', ParseIntPipe) businessId: number,
     @Param('moduleId', ParseIntPipe) moduleId: number
   ) {
-    console.log(`📥 [FINANCIAL-CONTROLLER] Solicitando registros para negocio ${businessId} y módulo ${moduleId}`);
     return this.recordService.findByBusinessAndModule(businessId, moduleId);
   }
 

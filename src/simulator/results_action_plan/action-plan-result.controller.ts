@@ -4,8 +4,8 @@ import { ActionPlanResultService } from './action-plan-result.service';
 import { CreateActionPlanResultDto } from './dto/create-action-plan-result.dto';
 import { UpdateActionPlanResultDto } from './dto/update-action-plan-result.dto';
 
-@ApiTags('Action Plans')
-@Controller('action-plans')
+@ApiTags('Action Plan')
+@Controller('action-plan')
 export class ActionPlanResultController {
   constructor(private readonly service: ActionPlanResultService) {}
 
@@ -14,6 +14,40 @@ export class ActionPlanResultController {
   @ApiResponse({ status: 201, description: 'The action plan result was successfully created.' })
   create(@Body() createDto: CreateActionPlanResultDto) {
     return this.service.create(createDto);
+  }
+
+  @Get('health')
+  @ApiOperation({ summary: 'Health check endpoint' })
+  @ApiResponse({ status: 200, description: 'Service is healthy' })
+  health() {
+    return { status: 'OK', message: 'Action plan service is running', timestamp: new Date().toISOString() };
+  }
+
+  @Post('multiple')
+  @ApiOperation({ summary: 'Create multiple action plan results' })
+  @ApiResponse({ status: 201, description: 'The action plan results were successfully created.' })
+  async createMultiple(@Body() createDto: any) {
+    try {
+      console.log('🔍 [ACTION-CONTROLLER] ===== DATOS RECIBIDOS =====');
+      console.log('🔍 [ACTION-CONTROLLER] createDto completo:', JSON.stringify(createDto, null, 2));
+      console.log('🔍 [ACTION-CONTROLLER] Tipo de createDto:', typeof createDto);
+      console.log('🔍 [ACTION-CONTROLLER] createDto.results:', createDto?.results);
+      console.log('🔍 [ACTION-CONTROLLER] Es array:', Array.isArray(createDto?.results));
+      console.log('🔍 [ACTION-CONTROLLER] Longitud:', createDto?.results?.length);
+      
+      if (!createDto.results || !Array.isArray(createDto.results) || createDto.results.length === 0) {
+        console.log('❌ [ACTION-CONTROLLER] Validación fallida');
+        throw new Error('Se requiere un array de resultados para crear múltiples planes de acción');
+      }
+      
+      console.log('✅ [ACTION-CONTROLLER] Llamando al servicio...');
+      const result = await this.service.createMultiple(createDto.results);
+      console.log('✅ [ACTION-CONTROLLER] Servicio completado');
+      return result;
+    } catch (error) {
+      console.error('❌ [ACTION-CONTROLLER] Error:', error);
+      throw error;
+    }
   }
 
   @Get()

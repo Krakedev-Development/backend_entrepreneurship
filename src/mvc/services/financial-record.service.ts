@@ -48,8 +48,6 @@ export class FinancialRecordService {
   }
 
   async findByBusinessAndModule(businessId: number, moduleId: number): Promise<FinancialRecord[]> {
-    console.log(`🔍 [FINANCIAL-SERVICE] Buscando registros para negocio ${businessId} y módulo ${moduleId}`);
-    
     const recordsPrisma = await this.prisma.registros_financieros.findMany({
       where: { 
         negocio_id: businessId,
@@ -60,7 +58,6 @@ export class FinancialRecordService {
       }
     });
     
-    console.log(`✅ [FINANCIAL-SERVICE] Encontrados ${recordsPrisma.length} registros`);
     return recordsPrisma.map(this.mapper.toDomain);
   }
 
